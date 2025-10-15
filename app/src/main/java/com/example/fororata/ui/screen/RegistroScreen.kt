@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fororata.navigation.NavigationBar
 import com.example.fororata.viewmodel.UsuarioViewModel
 
 @Composable
@@ -108,15 +110,7 @@ fun RegistroScreen(
             Spacer(Modifier.width(width = 8.dp))
             Text(text = "Acepto los términos y condiciones")
         }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+        Spacer(Modifier.width(width = 8.dp))
         // Botón para volver a Home
         Button(
             onClick = { navController.navigate("inicio") },
@@ -124,13 +118,12 @@ fun RegistroScreen(
         ) {
             Text("Volver a Home")
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // Botón para enviar formulario
         Button(
             onClick = {
-                viewModel.enviarFormulario()   // función que procesa los datos
+                viewModel.validarFormulario()   // función que procesa los datos
                 navController.navigate("resumen") // después redirige a Resumen
             },
             modifier = Modifier.fillMaxWidth()
