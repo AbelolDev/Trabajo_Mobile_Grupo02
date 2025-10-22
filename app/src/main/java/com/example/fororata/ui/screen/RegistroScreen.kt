@@ -23,7 +23,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.fororata.navigation.NavigationBar
 import com.example.fororata.viewmodel.UsuarioViewModel
 
 @Composable
@@ -82,19 +81,6 @@ fun RegistroScreen(
             isError = estado.errores.clave != null,
             supportingText = {
                 estado.errores.clave?.let {
-                    Text(text = it, color = MaterialTheme.colorScheme.error)
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-        // Campo dirección
-        OutlinedTextField(
-            value = estado.direccion,
-            onValueChange = viewModel::onDireccionChange,
-            label = { Text(text = "Dirección") },
-            isError = estado.errores.direccion != null,
-            supportingText = {
-                estado.errores.direccion?.let {
                     Text(text = it, color = MaterialTheme.colorScheme.error)
                 }
             },

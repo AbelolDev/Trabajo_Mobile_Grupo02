@@ -14,7 +14,8 @@ import com.example.fororata.viewmodel.UsuarioViewModel
 @Composable
 fun HomeScreenContent(
     onNavigateRegistro: (() -> Unit)? = null,
-    onNavigateResumen: (() -> Unit)? = null
+    onNavigateResumen: (() -> Unit)? = null,
+    onNavigatePublicaciones: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -42,6 +43,15 @@ fun HomeScreenContent(
         ) {
             Text("Ir a Registro")
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = { onNavigatePublicaciones?.invoke() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Ir a Publicaciones")
+        }
     }
 }
 
@@ -49,6 +59,7 @@ fun HomeScreenContent(
 fun HomeScreen(navController: NavController, viewModel: UsuarioViewModel) {
     HomeScreenContent(
         onNavigateRegistro = { navController.navigate("registro") },
-        onNavigateResumen = { navController.navigate("resumen") }
+        onNavigateResumen = { navController.navigate("resumen") },
+        onNavigatePublicaciones = { navController.navigate("publicaciones")}
     )
 }

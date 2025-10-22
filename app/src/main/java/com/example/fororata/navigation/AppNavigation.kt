@@ -6,13 +6,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fororata.ui.screen.*
+import com.example.fororata.viewmodel.PublicacionViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
+import com.example.fororata.ui.screen.PublicacionesCrearScreen
+
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
     val usuarioViewModel: UsuarioViewModel = viewModel()
+
+    val publicacionViewModel: PublicacionViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -26,6 +31,12 @@ fun AppNavigation() {
         }
         composable(route = "resumen") {
             ResumenScreen(usuarioViewModel)
+        }
+        composable(route = "publicaciones") {
+            PublicacionesScreen(navController, publicacionViewModel)
+        }
+        composable(route = "crear-publicaciones") {
+            PublicacionesCrearScreen(navController, publicacionViewModel)
         }
     }
 }
