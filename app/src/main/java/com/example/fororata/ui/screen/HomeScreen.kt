@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fororata.components.BottomNavBar
 import com.example.fororata.viewmodel.UsuarioViewModel
 
 @Composable
@@ -57,9 +58,17 @@ fun HomeScreenContent(
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: UsuarioViewModel) {
-    HomeScreenContent(
-        onNavigateRegistro = { navController.navigate("registro") },
-        onNavigateResumen = { navController.navigate("resumen") },
-        onNavigatePublicaciones = { navController.navigate("publicaciones")}
-    )
+    Scaffold(
+        bottomBar = {
+            BottomNavBar(navController = navController)
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            HomeScreenContent(
+                onNavigateRegistro = { navController.navigate("registro") },
+                onNavigateResumen = { navController.navigate("resumen") },
+                onNavigatePublicaciones = { navController.navigate("publicaciones") }
+            )
+        }
+    }
 }

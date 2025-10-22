@@ -14,11 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fororata.model.PublicacionErrores
+import com.example.fororata.components.BottomNavBar
 import com.example.fororata.viewmodel.PublicacionViewModel
+import com.example.fororata.viewmodel.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PublicacionesScreen(
+fun PublicacionesScreenContent(
     navController: NavController,
     viewModel: PublicacionViewModel
 ) {
@@ -117,6 +119,19 @@ fun PublicacionCard(publicacion: PublicacionErrores) {
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@Composable
+fun PublicacionesScreen(navController: NavController, viewModel: PublicacionViewModel) {
+    Scaffold(
+        bottomBar = {
+            BottomNavBar(navController = navController)
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            PublicacionesScreenContent(navController = navController, viewModel = viewModel)
         }
     }
 }

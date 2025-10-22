@@ -1,19 +1,7 @@
 package com.example.fororata.ui.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,98 +11,114 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fororata.components.BottomNavBar
 import com.example.fororata.viewmodel.UsuarioViewModel
 
 @Composable
-fun RegistroScreen(
+fun RegistroScreenContent(
     navController: NavController,
     viewModel: UsuarioViewModel
 ) {
     val estado by viewModel.estado.collectAsState()
 
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(all = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(space = 12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             text = "Inicio de sesión",
-            fontSize = 16.sp,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            fontSize = 20.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
         )
 
-        // Campo nombre
+        // Nombre
         OutlinedTextField(
             value = estado.nombre,
             onValueChange = viewModel::onNombreChange,
-            label = { Text(text = "Nombre") },
+            label = { Text("Nombre") },
             isError = estado.errores.nombre != null,
             supportingText = {
                 estado.errores.nombre?.let {
-                    Text(text = it, color = MaterialTheme.colorScheme.error)
+                    Text(it, color = MaterialTheme.colorScheme.error)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Campo correo
+        // Correo
         OutlinedTextField(
             value = estado.correo,
             onValueChange = viewModel::onCorreoChange,
-            label = { Text(text = "Correo electrónico") },
+            label = { Text("Correo electrónico") },
             isError = estado.errores.correo != null,
             supportingText = {
                 estado.errores.correo?.let {
-                    Text(text = it, color = MaterialTheme.colorScheme.error)
+                    Text(it, color = MaterialTheme.colorScheme.error)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Campo clave
+        // Contraseña
         OutlinedTextField(
             value = estado.clave,
             onValueChange = viewModel::onClaveChange,
-            label = { Text(text = "Contraseña") },
+            label = { Text("Contraseña") },
             visualTransformation = PasswordVisualTransformation(),
             isError = estado.errores.clave != null,
             supportingText = {
                 estado.errores.clave?.let {
-                    Text(text = it, color = MaterialTheme.colorScheme.error)
+                    Text(it, color = MaterialTheme.colorScheme.error)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Checkbox: aceptar términos
+        // Checkbox
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = estado.aceptaTerminos,
                 onCheckedChange = viewModel::onAceptarTerminosChange
             )
-            Spacer(Modifier.width(width = 8.dp))
-            Text(text = "Acepto los términos y condiciones")
+            Spacer(Modifier.width(8.dp))
+            Text("Acepto los términos y condiciones")
         }
-        Spacer(Modifier.width(width = 8.dp))
-        // Botón para volver a Home
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Botón volver
         Button(
             onClick = { navController.navigate("inicio") },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Volver a Home")
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón para enviar formulario
+        // Botón enviar
         Button(
             onClick = {
-                viewModel.validarFormulario()   // función que procesa los datos
-                navController.navigate("resumen") // después redirige a Resumen
+                if (viewModel.validarFormulario()) {
+                    navController.navigate("resumen")
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Enviar formulario")
+        }
+    }
+}
+
+@Composable
+fun RegistroScreen(navController: NavController, viewModel: UsuarioViewModel) {
+    Scaffold(
+        bottomBar = {
+            BottomNavBar(navController = navController)
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            RegistroScreenContent(navController = navController, viewModel = viewModel)
         }
     }
 }
