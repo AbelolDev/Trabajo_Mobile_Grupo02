@@ -1,5 +1,6 @@
 package com.example.fororata.ui.screen
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,11 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.fororata.viewmodel.PerfilViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
+import com.example.fororata.components.ImagenInteligente.ImagenInteligente
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,15 +32,11 @@ fun FotoUsuarioScreen(
 
     val launcherCamara = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        perfilViewModel.actualizarImagenDesdeCamara(success)
-    }
+    ) { success -> perfilViewModel.actualizarImagenDesdeCamara(success) }
 
     val launcherGaleria = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        perfilViewModel.actualizarImagenDesdeGaleria(uri)
-    }
+    ) { uri: Uri? -> perfilViewModel.actualizarImagenDesdeGaleria(uri) }
 
     Scaffold(
         topBar = {
@@ -57,51 +56,75 @@ fun FotoUsuarioScreen(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            // Vista previa
-            AsyncImage(
-                model = imagenPerfil,
-                contentDescription = "Foto de perfil",
-                modifier = Modifier
-                    .size(220.dp)
-                    .padding(8.dp),
-                contentScale = ContentScale.Crop
+            ImagenInteligente(
+                imageUri = imagenPerfil,
+                size = 200.dp,
+                borderWidth = 3.dp,
+                borderColor = MaterialTheme.colorScheme.primary
             )
 
-            // Botones de selección
-            Button(
-                onClick = {
-                    val uri = perfilViewModel.crearImagenTemporal(context)
-                    launcherCamara.launch(uri)
-                },
-                modifier = Modifier.fillMaxWidth()
+            // Primera fila: Cámara y Galería
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text("Tomar foto con cámara")
+                Button(
+                    onClick = {
+                        val uri = perfilViewModel.crearImagenTemporal(context)
+                        launcherCamara.launch(uri)
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Cámara")
+                }
+
+                Button(
+                    onClick = { launcherGaleria.launch("image/*") },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Galería")
+                }
             }
 
-            Button(
-                onClick = { launcherGaleria.launch("image/*") },
-                modifier = Modifier.fillMaxWidth()
+            // Segunda fila: Continuar y Volver
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text("Elegir desde galería")
-            }
+                Button(
+                    onClick = { navController.navigate("resumen") },
+                    modifier = Modifier.weight(1f),
+                    enabled = imagenPerfil != null
+                ) {
+                    Text("Continuar")
+                }
 
-            // Botón para continuar
-            Button(
-                onClick = {
-                    navController.navigate("resumen")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
-                enabled = imagenPerfil != null
-            ) {
-                Text("Continuar al resumen")
-            }
-
-            // Volver
-            TextButton(onClick = { navController.popBackStack() }) {
-                Text("Volver al formulario")
+                TextButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Volver")
+                }
             }
         }
     }
+}
+
+
+@SuppressLint("ViewModelConstructorInComposable")
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun FotoUsuarioScreenPreview() {
+    // ViewModel de prueba para Preview
+    val perfilViewModel = PerfilViewModel(application = androidx.compose.ui.platform.LocalContext.current.applicationContext as android.app.Application)
+    val usuarioViewModel = UsuarioViewModel()
+
+    // Opcional: podemos setear una imagen de prueba
+    // perfilViewModel.actualizarImagenDesdeGaleria(Uri.parse("https://via.placeholder.com/150"))
+
+    FotoUsuarioScreen(
+        navController = androidx.navigation.compose.rememberNavController(),
+        perfilViewModel = perfilViewModel,
+        usuarioViewModel = usuarioViewModel
+    )
 }
