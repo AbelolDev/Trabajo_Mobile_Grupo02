@@ -1,25 +1,59 @@
 package com.example.fororata.ui.screen
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
+import coil.compose.AsyncImage
 import com.example.fororata.viewmodel.UsuarioViewModel
+import com.example.fororata.viewmodel.PerfilViewModel
 
 @Composable
-fun ResumenScreen(viewModel: UsuarioViewModel) {
-    val estado by viewModel.estado.collectAsState()
+fun ResumenScreen(
+    usuarioViewModel: UsuarioViewModel,
+    perfilViewModel: PerfilViewModel
+) {
+    val estado by usuarioViewModel.estado.collectAsState()
+    val imagenPerfil by perfilViewModel.imagenPerfil.collectAsState()
 
-    Column(Modifier.padding(all = 16.dp)) {
-        Text(text = "Resumen del Registro", style = MaterialTheme.typography.headlineMedium)
-        Text(text = "Nombre: ${estado.nombre}")
-        Text(text = "Correo: ${estado.correo}")
-        Text(text = "Contraseña: ${"*".repeat(n = estado.clave.length)}")
-        Text(text = "Términos: ${if (estado.aceptaTerminos) "Aceptados" else "No aceptados"}")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Resumen del Registro",
+            style = MaterialTheme.typography.headlineMedium
+        )
+
+        // Imagen del usuario
+        AsyncImage(
+            model = imagenPerfil,
+            contentDescription = "Foto de perfil",
+            modifier = Modifier
+                .size(180.dp)
+                .padding(top = 16.dp),
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Nombre: ${estado.nombre}", style = MaterialTheme.typography.bodyLarge)
+        Text("Correo: ${estado.correo}", style = MaterialTheme.typography.bodyLarge)
+        Text("Contraseña: ${"*".repeat(estado.clave.length)}", style = MaterialTheme.typography.bodyLarge)
+        Text(
+            "Términos: ${if (estado.aceptaTerminos) "Aceptados" else "No aceptados"}",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(onClick = { /* Aquí podrías enviar los datos o cerrar sesión */ }) {
+            Text("Finalizar registro")
+        }
     }
 }

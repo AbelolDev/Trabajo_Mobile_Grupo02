@@ -39,7 +39,7 @@ fun PublicacionesScreenContent(
             ),
             PublicacionErrores(
                 id = 3,
-                titulo = "Persona 5 Royal > Overwatch 2 ??",
+                titulo = "Persona 5 Royal >> Overwatch 2",
                 estrellas = 3
             ),
             PublicacionErrores(

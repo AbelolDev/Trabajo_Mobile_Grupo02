@@ -8,33 +8,53 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fororata.ui.screen.*
 import com.example.fororata.viewmodel.PublicacionViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
-import com.example.fororata.ui.screen.PublicacionesCrearScreen
-
+import com.example.fororata.viewmodel.PerfilViewModel
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
+    // ViewModels compartidos
     val usuarioViewModel: UsuarioViewModel = viewModel()
-
     val publicacionViewModel: PublicacionViewModel = viewModel()
+    val perfilViewModel: PerfilViewModel = viewModel()
 
     NavHost(
         navController = navController,
         startDestination = "inicio"
     ) {
+        // Pantalla principal
         composable(route = "inicio") {
             HomeScreen(navController, usuarioViewModel)
         }
+
+        // Registro
         composable(route = "registro") {
             RegistroScreen(navController, usuarioViewModel)
         }
-        composable(route = "resumen") {
-            ResumenScreen(usuarioViewModel)
+
+        // Pantalla para seleccionar foto
+        composable(route = "foto-usuario") {
+            FotoUsuarioScreen(
+                navController = navController,
+                perfilViewModel = perfilViewModel,
+                usuarioViewModel = usuarioViewModel
+            )
         }
+
+        // Resumen del registro con imagen
+        composable(route = "resumen") {
+            ResumenScreen(
+                usuarioViewModel = usuarioViewModel,
+                perfilViewModel = perfilViewModel
+            )
+        }
+
+        // Publicaciones y creación
         composable(route = "publicaciones") {
             PublicacionesScreen(navController, publicacionViewModel)
         }
+
         composable(route = "crear-publicaciones") {
             PublicacionesCrearScreen(navController, publicacionViewModel)
         }

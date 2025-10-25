@@ -31,6 +31,11 @@ class UsuarioViewModel  : ViewModel() {
         _estado.update { it.copy(aceptaTerminos = valor) }
     }
 
+    // UsuarioViewModel.kt
+    fun onFotoChange(uri: String) {
+        _estado.update { it.copy(fotoUri = uri) }
+    }
+
     fun validarFormulario(): Boolean {
         val estadoActual = _estado.value
         val errores = UsuarioErrores(

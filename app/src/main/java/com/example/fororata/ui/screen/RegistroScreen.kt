@@ -10,14 +10,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.fororata.components.BottomNavBar
+import com.example.fororata.viewmodel.PerfilViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
 
 @Composable
 fun RegistroScreenContent(
     navController: NavController,
-    viewModel: UsuarioViewModel
+    viewModel: UsuarioViewModel,
+    perfilViewModel: PerfilViewModel = viewModel()
 ) {
     val estado by viewModel.estado.collectAsState()
 
@@ -86,26 +89,13 @@ fun RegistroScreenContent(
             Text("Acepto los términos y condiciones")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botón volver
         Button(
-            onClick = { navController.navigate("inicio") },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { navController.navigate("foto-usuario") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
         ) {
-            Text("Volver a Home")
-        }
-
-        // Botón enviar
-        Button(
-            onClick = {
-                if (viewModel.validarFormulario()) {
-                    navController.navigate("resumen")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Enviar formulario")
+            Text("Continuar")
         }
     }
 }
