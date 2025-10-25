@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fororata.components.BotonComponente
 import com.example.fororata.components.BottomNavBar
 import com.example.fororata.viewmodel.UsuarioViewModel
 
@@ -38,21 +39,19 @@ fun HomeScreenContent(
         )
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
+        BotonComponente(
+            text = "Ir a registro",
             onClick = { onNavigateRegistro?.invoke() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Ir a Registro")
-        }
+            enabled = true
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(
+        BotonComponente(
+            text = "Ir a publicaciones",
             onClick = { onNavigatePublicaciones?.invoke() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Ir a Publicaciones")
-        }
+            enabled = true
+        )
     }
 }
 

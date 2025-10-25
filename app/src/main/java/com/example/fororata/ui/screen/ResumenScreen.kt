@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
-import coil.compose.AsyncImage
+import com.example.fororata.components.ImagenInteligente
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
 
@@ -31,13 +31,11 @@ fun ResumenScreen(
         )
 
         // Imagen del usuario
-        AsyncImage(
-            model = imagenPerfil,
-            contentDescription = "Foto de perfil",
-            modifier = Modifier
-                .size(180.dp)
-                .padding(top = 16.dp),
-            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+        ImagenInteligente(
+            imageUri = imagenPerfil,
+            size = 200.dp,
+            borderWidth = 3.dp,
+            borderColor = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(16.dp))
