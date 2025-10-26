@@ -53,11 +53,11 @@ fun BottomNavBar(navController: NavController) {
             label = { Text("Publicaciones") }
         )
 
-        // --- Botón Perfil / Registro ---
+        // --- Botón Perfil / iniciar-sesion ---
         NavigationBarItem(
-            selected = currentRoute == "registro",
+            selected = currentRoute == "iniciar-sesion",
             onClick = {
-                navController.navigate("registro") {
+                navController.navigate("iniciar-sesion") {
                     popUpTo("inicio") { inclusive = false }
                     launchSingleTop = true
                 }

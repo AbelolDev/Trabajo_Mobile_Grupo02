@@ -8,18 +8,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
 import com.example.fororata.components.ImagenInteligente
-import com.example.fororata.navigation.AppNavigation
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
+import com.example.fororata.viewmodel.UsuarioDBViewModel
+import com.example.fororata.data.db.Usuario
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun ResumenScreen(
     usuarioViewModel: UsuarioViewModel,
     perfilViewModel: PerfilViewModel,
+    usuarioDBViewModel: UsuarioDBViewModel,
     navController: NavController
 ) {
     val estado by usuarioViewModel.estado.collectAsState()
     val imagenPerfil by perfilViewModel.imagenPerfil.collectAsState()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -53,7 +58,22 @@ fun ResumenScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(onClick = { navController.navigate("inicio") }) {
+        Button(onClick = {
+            usuarioDBViewModel.registrar(
+                nombre = estado.nombre,
+                correo = estado.correo,
+                clave = estado.clave
+            ) { exito ->
+                if (exito) {
+                    Toast.makeText(context, "Datos guardados exitosamente", Toast.LENGTH_SHORT).show()
+                    navController.navigate("inicio") {
+                        popUpTo("resumen") { inclusive = true }
+                    }
+                } else {
+                    Toast.makeText(context, "Error al guardar los datos", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }) {
             Text("Finalizar registro")
         }
     }

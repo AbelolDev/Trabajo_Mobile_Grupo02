@@ -9,6 +9,7 @@ import com.example.fororata.ui.screen.*
 import com.example.fororata.viewmodel.PublicacionViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
+import com.example.fororata.viewmodel.UsuarioDBViewModel
 
 @Composable
 fun AppNavigation() {
@@ -18,6 +19,7 @@ fun AppNavigation() {
     val usuarioViewModel: UsuarioViewModel = viewModel()
     val publicacionViewModel: PublicacionViewModel = viewModel()
     val perfilViewModel: PerfilViewModel = viewModel()
+    val usuarioDBViewModel: UsuarioDBViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -31,6 +33,14 @@ fun AppNavigation() {
         // Registro
         composable(route = "registro") {
             RegistroScreen(navController, usuarioViewModel)
+        }
+
+        // Login
+        composable(route = "iniciar-sesion") {
+            IniciarSesionScreen(
+                navController = navController,
+                usuarioDBViewModel = usuarioDBViewModel
+            )
         }
 
         // Pantalla para seleccionar foto
@@ -47,7 +57,15 @@ fun AppNavigation() {
             ResumenScreen(
                 usuarioViewModel = usuarioViewModel,
                 perfilViewModel = perfilViewModel,
+                usuarioDBViewModel = usuarioDBViewModel,
                 navController = navController
+            )
+        }
+
+        composable(route = "resumenDB") {
+            ResumenDBScreen(
+                navController = navController,
+                usuarioDBViewModel = usuarioDBViewModel
             )
         }
 
