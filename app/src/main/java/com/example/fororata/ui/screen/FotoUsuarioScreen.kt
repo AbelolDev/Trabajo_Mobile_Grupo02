@@ -1,7 +1,8 @@
 package com.example.fororata.ui.screen
 
-import android.annotation.SuppressLint
+import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -15,14 +16,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.fororata.components.BotonComponente
+import com.example.fororata.components.ImagenInteligente
 import com.example.fororata.viewmodel.PerfilViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
-import com.example.fororata.components.ImagenInteligente
-import com.example.fororata.components.BotonComponente
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,18 +34,38 @@ fun FotoUsuarioScreen(
     val context = LocalContext.current
     val imagenPerfil by perfilViewModel.imagenPerfil.collectAsState()
 
+    // Estado local para almacenar URI temporal de cámara
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Launcher para la cámara
     val launcherCamara = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
-    ) { success -> perfilViewModel.actualizarImagenDesdeCamara(success) }
+    ) { success ->
+        if (success && cameraUri != null) {
+            perfilViewModel.actualizarImagenDesdeCamara(true)
+        } else {
+            Toast.makeText(context, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show()
+        }
+    }
 
+    // Launcher para la galería
     val launcherGaleria = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? -> perfilViewModel.actualizarImagenDesdeGaleria(uri) }
+    ) { uri: Uri? ->
+        if (uri != null) perfilViewModel.actualizarImagenDesdeGaleria(uri)
+    }
+
+    // Launcher para permisos de cámara
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text("Seleccionar Foto de Perfil") })
-        }
+        topBar = { CenterAlignedTopAppBar(title = { Text("Seleccionar Foto de Perfil") }) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -77,7 +97,7 @@ fun FotoUsuarioScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Primera fila: Cámara y Galería
+            // Fila de botones: Cámara y Galería
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -85,8 +105,16 @@ fun FotoUsuarioScreen(
                 BotonComponente(
                     text = "Usar cámara",
                     onClick = {
-                        val uri = perfilViewModel.crearImagenTemporal(context)
-                        launcherCamara.launch(uri)
+                        val permission = Manifest.permission.CAMERA
+                        if (ContextCompat.checkSelfPermission(context, permission)
+                            == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        ) {
+                            val uri = perfilViewModel.crearImagenTemporal(context)
+                            cameraUri = uri
+                            launcherCamara.launch(uri)
+                        } else {
+                            requestPermissionLauncher.launch(permission)
+                        }
                     },
                     modifier = Modifier.weight(1f)
                 )
@@ -100,7 +128,7 @@ fun FotoUsuarioScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Segunda fila: Continuar y Volver
+            // Fila de botones: Continuar y Volver
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -118,22 +146,6 @@ fun FotoUsuarioScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
-
         }
     }
-}
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun FotoUsuarioScreenPreview() {
-    val context = LocalContext.current
-    val perfilViewModel = PerfilViewModel(context.applicationContext as android.app.Application)
-    val usuarioViewModel = UsuarioViewModel()
-
-    FotoUsuarioScreen(
-        navController = rememberNavController(),
-        perfilViewModel = perfilViewModel,
-        usuarioViewModel = usuarioViewModel
-    )
 }

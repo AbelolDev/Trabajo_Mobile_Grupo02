@@ -6,14 +6,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.navigation.NavController
 import com.example.fororata.components.ImagenInteligente
+import com.example.fororata.navigation.AppNavigation
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
 
 @Composable
 fun ResumenScreen(
     usuarioViewModel: UsuarioViewModel,
-    perfilViewModel: PerfilViewModel
+    perfilViewModel: PerfilViewModel,
+    navController: NavController
 ) {
     val estado by usuarioViewModel.estado.collectAsState()
     val imagenPerfil by perfilViewModel.imagenPerfil.collectAsState()
@@ -50,7 +53,7 @@ fun ResumenScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(onClick = { /* Aquí podrías enviar los datos o cerrar sesión */ }) {
+        Button(onClick = { navController.navigate("inicio") }) {
             Text("Finalizar registro")
         }
     }

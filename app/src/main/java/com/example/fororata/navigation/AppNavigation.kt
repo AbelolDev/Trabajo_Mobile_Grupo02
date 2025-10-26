@@ -46,7 +46,8 @@ fun AppNavigation() {
         composable(route = "resumen") {
             ResumenScreen(
                 usuarioViewModel = usuarioViewModel,
-                perfilViewModel = perfilViewModel
+                perfilViewModel = perfilViewModel,
+                navController = navController
             )
         }
 
