@@ -7,14 +7,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.fororata.components.ImagenInteligente
+import com.example.fororata.viewmodel.PerfilViewModel
 import com.example.fororata.viewmodel.UsuarioDBViewModel
 
 @Composable
 fun ResumenDBScreen(
     navController: NavController,
-    usuarioDBViewModel: UsuarioDBViewModel
+    usuarioDBViewModel: UsuarioDBViewModel,
+    perfilViewModel: PerfilViewModel
 ) {
     val usuarioState = usuarioDBViewModel.usuarioActual.collectAsState()
+    val imagenPerfil by perfilViewModel.imagenPerfil.collectAsState()
     val usuario = usuarioState.value
 
     if (usuario == null) {
@@ -39,7 +43,15 @@ fun ResumenDBScreen(
                 style = MaterialTheme.typography.headlineMedium
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Imagen del usuario
+            ImagenInteligente(
+                imageUri = imagenPerfil,
+                size = 200.dp,
+                borderWidth = 3.dp,
+                borderColor = MaterialTheme.colorScheme.primary
+            )
 
             Text("Nombre: ${u.nombre}", style = MaterialTheme.typography.bodyLarge)
             Text("Correo: ${u.correo}", style = MaterialTheme.typography.bodyLarge)

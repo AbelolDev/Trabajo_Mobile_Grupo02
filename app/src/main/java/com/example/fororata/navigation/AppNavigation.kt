@@ -65,7 +65,8 @@ fun AppNavigation() {
         composable(route = "resumenDB") {
             ResumenDBScreen(
                 navController = navController,
-                usuarioDBViewModel = usuarioDBViewModel
+                usuarioDBViewModel = usuarioDBViewModel,
+                perfilViewModel = perfilViewModel
             )
         }
 
