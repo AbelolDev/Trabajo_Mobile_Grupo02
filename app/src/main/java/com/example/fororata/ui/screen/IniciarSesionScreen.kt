@@ -15,11 +15,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.fororata.components.BottomNavBar
 import com.example.fororata.viewmodel.UsuarioDBViewModel
+import com.example.fororata.viewmodel.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IniciarSesionScreen(
+fun IniciarSesionScreenContent(
     navController: NavController,
     usuarioDBViewModel: UsuarioDBViewModel = viewModel()
 ) {
@@ -129,6 +131,25 @@ fun IniciarSesionScreen(
                     Text("Cerrar sesión")
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun IniciarSesionScreen(
+    navController: NavController,
+    usuarioDBViewModel: UsuarioDBViewModel = viewModel()
+) {
+    Scaffold(
+        bottomBar = {
+            BottomNavBar(navController = navController)
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            IniciarSesionScreenContent(
+                navController = navController,
+                usuarioDBViewModel = usuarioDBViewModel
+            )
         }
     }
 }
