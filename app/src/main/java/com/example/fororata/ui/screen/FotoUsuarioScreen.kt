@@ -140,11 +140,11 @@ fun FotoUsuarioScreen(
                     enabled = imagenPerfil != null
                 )
 
-                BotonComponente(
-                    text = "Volver",
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f)
-                )
+                Button(
+                    onClick = { navController.navigate("registro") }
+                ) {
+                    Text("Volver")
+                }
             }
         }
     }

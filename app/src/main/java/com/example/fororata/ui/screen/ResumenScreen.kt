@@ -11,7 +11,6 @@ import com.example.fororata.components.ImagenInteligente
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
 import com.example.fororata.viewmodel.UsuarioDBViewModel
-import com.example.fororata.data.db.Usuario
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 
@@ -76,5 +75,9 @@ fun ResumenScreen(
         }) {
             Text("Finalizar registro")
         }
+
+        Button(onClick = {
+            navController.navigate(route = "foto-usuario")
+        }) { Text("Volver")}
     }
 }
