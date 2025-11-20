@@ -143,3 +143,9 @@ fun PublicacionesCrearScreen(
         }
     }
 }
+
+private fun PublicacionViewModel.agregarComentario(nuevoComentario: String) {}
+
+private fun PublicacionViewModel.onEstrellasChange(i: Int) {
+    TODO("Not yet implemented")
+}
