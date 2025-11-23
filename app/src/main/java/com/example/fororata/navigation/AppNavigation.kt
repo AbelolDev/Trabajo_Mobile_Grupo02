@@ -2,9 +2,11 @@ package com.example.fororata.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.fororata.ui.screen.*
 import com.example.fororata.viewmodel.PublicacionViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
@@ -70,13 +72,61 @@ fun AppNavigation() {
             )
         }
 
-        // Publicaciones y creación
+        // Publicaciones - Lista
         composable(route = "publicaciones") {
-            PublicacionesScreen(navController, publicacionViewModel)
+            PublicacionesScreen(navController, publicacionViewModel, usuarioDBViewModel)
         }
 
+        // Publicaciones - Detalle con comentarios
+        composable(
+            route = "detalle-publicacion/{publicacionId}",
+            arguments = listOf(
+                navArgument("publicacionId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val publicacionId = backStackEntry.arguments?.getInt("publicacionId") ?: 0
+            DetallePublicacionScreen(
+                navController = navController,
+                viewModel = publicacionViewModel,
+                usuarioDBViewModel = usuarioDBViewModel,
+                publicacionId = publicacionId
+            )
+        }
+
+        // Publicaciones - Crear nueva
+        composable(route = "crear-publicacion") {
+            CrearEditarPublicacionScreen(
+                navController = navController,
+                viewModel = publicacionViewModel,
+                usuarioDBViewModel = usuarioDBViewModel,
+                publicacionId = null
+            )
+        }
+
+        // Publicaciones - Editar existente
+        composable(
+            route = "editar-publicacion/{publicacionId}",
+            arguments = listOf(
+                navArgument("publicacionId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val publicacionId = backStackEntry.arguments?.getInt("publicacionId")
+            CrearEditarPublicacionScreen(
+                navController = navController,
+                viewModel = publicacionViewModel,
+                usuarioDBViewModel = usuarioDBViewModel,
+                publicacionId = publicacionId
+            )
+        }
+
+        // Mantener la ruta antigua por compatibilidad (opcional)
         composable(route = "crear-publicaciones") {
-            PublicacionesCrearScreen(navController, publicacionViewModel)
+            CrearEditarPublicacionScreen(
+                navController = navController,
+                viewModel = publicacionViewModel,
+                usuarioDBViewModel = usuarioDBViewModel,
+                publicacionId = null
+            )
         }
     }
 }
