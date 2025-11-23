@@ -17,7 +17,8 @@ import com.example.fororata.viewmodel.UsuarioViewModel
 fun HomeScreenContent(
     onNavigateRegistro: (() -> Unit)? = null,
     onNavigateResumen: (() -> Unit)? = null,
-    onNavigatePublicaciones: (() -> Unit)? = null
+    onNavigatePublicaciones: (() -> Unit)? = null,
+    onNavigatePost: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -52,6 +53,14 @@ fun HomeScreenContent(
             onClick = { onNavigatePublicaciones?.invoke() },
             enabled = true
         )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        BotonComponente(
+            text = "Ir a Post",
+            onClick = { onNavigatePost?.invoke() },
+            enabled = true
+        )
     }
 }
 
@@ -66,7 +75,8 @@ fun HomeScreen(navController: NavController, viewModel: UsuarioViewModel) {
             HomeScreenContent(
                 onNavigateRegistro = { navController.navigate("registro") },
                 onNavigateResumen = { navController.navigate("resumen") },
-                onNavigatePublicaciones = { navController.navigate("publicaciones") }
+                onNavigatePublicaciones = { navController.navigate("publicaciones") },
+                onNavigatePost = { navController.navigate(route = "post") }
             )
         }
     }

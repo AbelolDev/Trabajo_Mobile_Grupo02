@@ -5,6 +5,9 @@
     <!-- Permisos para la cámara -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- Permiso para peticiones HTTP -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- Permisos para leer imágenes de la galería -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />

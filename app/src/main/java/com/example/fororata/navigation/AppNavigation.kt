@@ -1,14 +1,17 @@
 package com.example.fororata.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.size.ViewSizeResolver
 import com.example.fororata.ui.screen.*
 import com.example.fororata.viewmodel.PublicacionViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
+import com.example.fororata.viewmodel.PostViewModel
 import com.example.fororata.viewmodel.UsuarioDBViewModel
 
 @Composable
@@ -20,6 +23,7 @@ fun AppNavigation() {
     val publicacionViewModel: PublicacionViewModel = viewModel()
     val perfilViewModel: PerfilViewModel = viewModel()
     val usuarioDBViewModel: UsuarioDBViewModel = viewModel()
+    val postViewModel: PostViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -77,6 +81,10 @@ fun AppNavigation() {
 
         composable(route = "crear-publicaciones") {
             PublicacionesCrearScreen(navController, publicacionViewModel)
+        }
+
+        composable(route = "post") {
+            PostScreen(postViewModel)
         }
     }
 }
