@@ -1,4 +1,4 @@
-package com.example.fororata.ui.screen
+package com.example.fororata.ui.screen.publicaciones
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*

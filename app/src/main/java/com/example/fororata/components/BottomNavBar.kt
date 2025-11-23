@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -64,6 +65,19 @@ fun BottomNavBar(navController: NavController) {
             },
             icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
             label = { Text("Perfil") }
+        )
+
+        // --- Botón Top 10 ---
+        NavigationBarItem(
+            selected = currentRoute == "top_posts",
+            onClick = {
+                navController.navigate("top_posts") {
+                    popUpTo("inicio") { inclusive = false }
+                    launchSingleTop = true
+                }
+            },
+            icon = { Icon(Icons.Default.Star, contentDescription = "Top 10") },
+            label = { Text("Top 10") }
         )
     }
 }

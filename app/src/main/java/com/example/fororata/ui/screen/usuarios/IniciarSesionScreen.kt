@@ -1,8 +1,7 @@
-package com.example.fororata.ui.screen
+package com.example.fororata.ui.screen.usuarios
 
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -17,7 +16,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.fororata.components.BottomNavBar
 import com.example.fororata.viewmodel.UsuarioDBViewModel
-import com.example.fororata.viewmodel.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

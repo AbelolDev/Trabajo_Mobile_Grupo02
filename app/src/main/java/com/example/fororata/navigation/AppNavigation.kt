@@ -1,13 +1,20 @@
 package com.example.fororata.navigation
 
+import TopPostsScreen
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import coil.size.ViewSizeResolver
 import com.example.fororata.ui.screen.*
+import com.example.fororata.ui.screen.publicaciones.PostScreen
+import com.example.fororata.ui.screen.publicaciones.PublicacionesCrearScreen
+import com.example.fororata.ui.screen.publicaciones.PublicacionesScreen
+import com.example.fororata.ui.screen.usuarios.FotoUsuarioScreen
+import com.example.fororata.ui.screen.usuarios.IniciarSesionScreen
+import com.example.fororata.ui.screen.usuarios.RegistroScreen
+import com.example.fororata.ui.screen.usuarios.ResumenDBScreen
+import com.example.fororata.ui.screen.usuarios.ResumenScreen
 import com.example.fororata.viewmodel.PublicacionViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
@@ -76,7 +83,7 @@ fun AppNavigation() {
 
         // Publicaciones y creación
         composable(route = "publicaciones") {
-            PublicacionesScreen(navController, publicacionViewModel)
+            PublicacionesScreen(navController, publicacionViewModel, usuarioDBViewModel)
         }
 
         composable(route = "crear-publicaciones") {
@@ -85,6 +92,10 @@ fun AppNavigation() {
 
         composable(route = "post") {
             PostScreen(postViewModel)
+        }
+
+        composable(route = "top_posts") {
+            TopPostsScreen(navController, postViewModel)
         }
     }
 }

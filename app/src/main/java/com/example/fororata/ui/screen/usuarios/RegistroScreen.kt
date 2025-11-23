@@ -1,4 +1,4 @@
-package com.example.fororata.ui.screen
+package com.example.fororata.ui.screen.usuarios
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

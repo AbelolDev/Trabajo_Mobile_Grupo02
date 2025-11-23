@@ -1,6 +1,7 @@
-package com.example.fororata.ui.screen
+package com.example.fororata.ui.screen.usuarios
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -107,7 +108,7 @@ fun FotoUsuarioScreen(
                     onClick = {
                         val permission = Manifest.permission.CAMERA
                         if (ContextCompat.checkSelfPermission(context, permission)
-                            == android.content.pm.PackageManager.PERMISSION_GRANTED
+                            == PackageManager.PERMISSION_GRANTED
                         ) {
                             val uri = perfilViewModel.crearImagenTemporal(context)
                             cameraUri = uri

@@ -1,4 +1,4 @@
-package com.example.fororata.ui.screen
+package com.example.fororata.ui.screen.publicaciones
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

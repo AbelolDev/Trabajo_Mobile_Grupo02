@@ -1,4 +1,4 @@
-package com.example.fororata.ui.screen
+package com.example.fororata.ui.screen.usuarios
 
 import android.Manifest
 import android.content.pm.PackageManager
