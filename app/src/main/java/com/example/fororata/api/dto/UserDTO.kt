@@ -1,7 +1,7 @@
 package com.example.fororata.api.dto
 
 data class UserDTO(
-    val id: Long,
+    val id: Long? = null,
     val nombre: String,
     val correo: String,
     val clave: String,

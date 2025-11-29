@@ -17,6 +17,8 @@ import androidx.navigation.NavController
 import com.example.fororata.viewmodel.APIviewmodel.UserViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fororata.api.dto.UserDTO
+import com.example.fororata.components.StatCard
+import com.example.fororata.components.UserAdminItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +28,10 @@ fun AdminDashboardScreen(
 ) {
     val users by userViewModel.users
     val isLoading by userViewModel.isLoading
+
+    LaunchedEffect(Unit) {
+        userViewModel.loadUsers()
+    }
 
     Scaffold(
         topBar = {
@@ -43,7 +49,7 @@ fun AdminDashboardScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { /* Acción para crear usuario admin */ },
+                onClick = { navController.navigate("admin-crear-admin") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Agregar") },
                 text = { Text("Nuevo Admin") }
             )
@@ -67,8 +73,8 @@ fun AdminDashboardScreen(
                     icon = Icons.Default.People
                 )
                 StatCard(
-                    title = "Administradores",
-                    value = users.count { it.rol?.nombre_rol == "admin" }.toString(),
+                    title = "Admins",
+                    value = users.count { it.rol?.nombre_rol?.equals("Administrador", ignoreCase = true) == true }.toString(),
                     icon = Icons.Default.AdminPanelSettings
                 )
             }
@@ -95,77 +101,6 @@ fun AdminDashboardScreen(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun StatCard(title: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    Card(
-        modifier = Modifier.width(120.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = value,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-            Text(
-                text = title,
-                fontSize = 12.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun UserAdminItem(user: UserDTO) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = if (user.rol?.nombre_rol == "admin") Icons.Default.AdminPanelSettings else Icons.Default.Person,
-                contentDescription = "Usuario",
-                tint = if (user.rol?.nombre_rol == "admin") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = user.nombre,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = user.correo,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = "Rol: ${user.rol?.nombre_rol ?: "Usuario"}",
-                    fontSize = 12.sp
-                )
-            }
-            IconButton(onClick = { /* Editar usuario */ }) {
-                Icon(Icons.Default.Edit, contentDescription = "Editar")
             }
         }
     }

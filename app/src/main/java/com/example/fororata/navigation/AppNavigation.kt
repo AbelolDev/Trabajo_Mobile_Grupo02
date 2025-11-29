@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fororata.ui.screen.*
 import com.example.fororata.ui.screen.admin.AdminDashboardScreen
+import com.example.fororata.ui.screen.admin.CreateAdminScreen
 import com.example.fororata.ui.screen.admin.LoginAdminScreen
 import com.example.fororata.ui.screen.publicaciones.PostScreen
 import com.example.fororata.ui.screen.publicaciones.PublicacionesCrearScreen
@@ -17,6 +18,7 @@ import com.example.fororata.ui.screen.usuarios.IniciarSesionScreen
 import com.example.fororata.ui.screen.usuarios.RegistroScreen
 import com.example.fororata.ui.screen.usuarios.ResumenDBScreen
 import com.example.fororata.ui.screen.usuarios.ResumenScreen
+import com.example.fororata.viewmodel.AdminViewModel
 import com.example.fororata.viewmodel.PublicacionViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
 import com.example.fororata.viewmodel.PerfilViewModel
@@ -33,6 +35,7 @@ fun AppNavigation() {
     val perfilViewModel: PerfilViewModel = viewModel()
     val usuarioDBViewModel: UsuarioDBViewModel = viewModel()
     val postViewModel: PostViewModel = viewModel()
+    val adminViewModel: AdminViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -106,6 +109,10 @@ fun AppNavigation() {
 
         composable(route = "admin-dashboard") {
             AdminDashboardScreen(navController = navController)
+        }
+
+        composable(route = "admin-crear-admin") {
+            CreateAdminScreen(navController = navController, adminViewModel = adminViewModel)
         }
     }
 }
