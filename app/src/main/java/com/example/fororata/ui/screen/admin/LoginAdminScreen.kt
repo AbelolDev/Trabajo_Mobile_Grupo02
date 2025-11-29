@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.fororata.viewmodel.APIviewmodel.UserViewModel
 import com.example.fororata.api.dto.UserDTO
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,10 +35,13 @@ fun LoginAdminScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    var loginError by remember { mutableStateOf<String?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     // Observar el estado del ViewModel
     val users by userViewModel.users
     val errorMessage by userViewModel.errorMessage
+    val usersLoading by userViewModel.isLoading
 
     LaunchedEffect(Unit) {
         userViewModel.loadUsers()
@@ -92,6 +96,24 @@ fun LoginAdminScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            // Mostrar estado de carga de usuarios
+            if (usersLoading) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Cargando usuarios...",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                CircularProgressIndicator(modifier = Modifier.size(20.dp))
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "${users.size} usuarios cargados",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
             // Campo de email
@@ -143,20 +165,39 @@ fun LoginAdminScreen(
             Button(
                 onClick = {
                     isLoading = true
-                    // Verificar credenciales
-                    val isAdmin = verifyAdminCredentials(email, password, users)
-                    if (isAdmin) {
-                        onLoginSuccess()
-                        navController.navigate("admin-dashboard")
-                    } else {
-                        // Mostrar error
+                    loginError = null
+
+                    coroutineScope.launch {
+                        try {
+                            // Forzar recarga de usuarios por si acaso
+                            userViewModel.loadUsers()
+
+                            // Pequeña pausa para asegurar que los datos estén cargados
+                            kotlinx.coroutines.delay(500)
+
+                            // Verificar credenciales
+                            val isAdmin = verifyAdminCredentials(email, password, users)
+
+                            if (isAdmin) {
+                                onLoginSuccess()
+                                navController.navigate("admin-dashboard") {
+                                    // Limpiar el stack de navegación
+                                    popUpTo("admin-login") { inclusive = true }
+                                }
+                            } else {
+                                loginError = "Credenciales incorrectas o no tienes permisos de administrador"
+                            }
+                        } catch (e: Exception) {
+                            loginError = "Error al verificar credenciales: ${e.message}"
+                        } finally {
+                            isLoading = false
+                        }
                     }
-                    isLoading = false
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = email.isNotBlank() && password.isNotBlank() && !isLoading
+                enabled = email.isNotBlank() && password.isNotBlank() && !isLoading && !usersLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
@@ -174,8 +215,8 @@ fun LoginAdminScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Mostrar mensajes de error
-            errorMessage?.let { message ->
+            // Mostrar mensajes de error del login
+            loginError?.let { message ->
                 Text(
                     text = message,
                     color = MaterialTheme.colorScheme.error,
@@ -183,7 +224,49 @@ fun LoginAdminScreen(
                 )
             }
 
+            // Mostrar mensajes de error de la carga de usuarios
+            errorMessage?.let { message ->
+                Text(
+                    text = "Error cargando usuarios: $message",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
+
+            // DEBUG: Mostrar información de usuarios cargados (solo para desarrollo)
+            if (users.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Text(
+                            text = "DEBUG - Usuarios cargados:",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        users.take(3).forEach { user ->
+                            Text(
+                                text = "• ${user.correo} - Rol: ${user.rol?.nombre_rol ?: "Sin rol"}",
+                                fontSize = 10.sp
+                            )
+                        }
+                        if (users.size > 3) {
+                            Text(
+                                text = "... y ${users.size - 3} más",
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             // Información para administradores
             Card(
@@ -218,9 +301,25 @@ private fun verifyAdminCredentials(
     password: String,
     users: List<UserDTO>
 ): Boolean {
+    println("Verificando credenciales para: $email")
+    println("Total usuarios cargados: ${users.size}")
+
+    users.forEach { user ->
+        println("Usuario: ${user.correo}, Rol: ${user.rol?.nombre_rol}")
+    }
+
     return users.any { user ->
-        user.correo == email &&
-                user.clave == password &&
-                user.rol?.nombre_rol?.equals("admin", ignoreCase = true) == true
+        val emailMatch = user.correo.equals(email, ignoreCase = true)
+        val passwordMatch = user.clave == password
+        // CORREGIDO: Buscar "Administrador" en lugar de "admin"
+        val isAdmin = user.rol?.nombre_rol?.equals("Administrador", ignoreCase = true) == true
+
+        val result = emailMatch && passwordMatch && isAdmin
+        if (result) {
+            println("✅ Usuario admin encontrado: ${user.correo}")
+            println("✅ Rol: ${user.rol?.nombre_rol}")
+            println("✅ Credenciales correctas")
+        }
+        result
     }
 }
