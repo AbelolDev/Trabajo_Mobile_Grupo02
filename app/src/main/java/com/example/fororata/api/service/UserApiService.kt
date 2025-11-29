@@ -4,18 +4,18 @@ import com.example.fororata.api.dto.UserDTO
 import retrofit2.http.*
 
 interface UserApiService {
-    @GET("usuarios")
+    @GET("users")
     suspend fun getUsers(): List<UserDTO>
 
-    @GET("usuarios/{id}")
+    @GET("users/{id}")
     suspend fun getUserById(@Path("id") id: Long): UserDTO
 
-    @POST("usuarios")
+    @POST("users")
     suspend fun createUser(@Body user: UserDTO): UserDTO
 
-    @PUT("usuarios/{id}")
+    @PUT("users/{id}")
     suspend fun updateUser(@Path("id") id: Long, @Body user: UserDTO): UserDTO
 
-    @DELETE("usuarios/{id}")
+    @DELETE("users/{id}")
     suspend fun deleteUser(@Path("id") id: Long)
 }

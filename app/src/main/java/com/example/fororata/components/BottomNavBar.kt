@@ -1,6 +1,7 @@
 package com.example.fororata.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -16,7 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 
 /**
  * Barra de navegación inferior de la app.
- * Permite cambiar entre las pantallas principales: Inicio, Publicaciones y Perfil.
+ * Permite cambiar entre las pantallas principales: Inicio, Publicaciones, Perfil, Top 10 y Admin.
  *
  * @param navController Controlador de navegación para gestionar las rutas.
  */
@@ -78,6 +79,24 @@ fun BottomNavBar(navController: NavController) {
             },
             icon = { Icon(Icons.Default.Star, contentDescription = "Top 10") },
             label = { Text("Top 10") }
+        )
+
+        // --- NUEVO: Botón Administración ---
+        NavigationBarItem(
+            selected = currentRoute == "admin-login",
+            onClick = {
+                navController.navigate("admin-login") {
+                    popUpTo("inicio") { inclusive = false }
+                    launchSingleTop = true
+                }
+            },
+            icon = {
+                Icon(
+                    Icons.Default.AdminPanelSettings,
+                    contentDescription = "Administración"
+                )
+            },
+            label = { Text("Admin") }
         )
     }
 }

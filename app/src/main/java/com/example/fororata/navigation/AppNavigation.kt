@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fororata.ui.screen.*
+import com.example.fororata.ui.screen.admin.AdminDashboardScreen
+import com.example.fororata.ui.screen.admin.LoginAdminScreen
 import com.example.fororata.ui.screen.publicaciones.PostScreen
 import com.example.fororata.ui.screen.publicaciones.PublicacionesCrearScreen
 import com.example.fororata.ui.screen.publicaciones.PublicacionesScreen
@@ -96,6 +98,14 @@ fun AppNavigation() {
 
         composable(route = "top_posts") {
             TopPostsScreen(navController, postViewModel)
+        }
+
+        composable(route = "admin-login") {
+            LoginAdminScreen(navController = navController)
+        }
+
+        composable(route = "admin-dashboard") {
+            AdminDashboardScreen(navController = navController)
         }
     }
 }
