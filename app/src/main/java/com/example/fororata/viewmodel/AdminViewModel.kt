@@ -73,7 +73,6 @@ class AdminViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    // Estados del formulario de creación
     private val _adminFormState = mutableStateOf(AdminFormState())
     val adminFormState: State<AdminFormState> = _adminFormState
 
@@ -276,7 +275,7 @@ class AdminViewModel @Inject constructor(
             passwordError = passwordError
         )
 
-        return emailError == null && passwordError == null
+        return emailError == null
     }
 
     // Función para verificar credenciales
