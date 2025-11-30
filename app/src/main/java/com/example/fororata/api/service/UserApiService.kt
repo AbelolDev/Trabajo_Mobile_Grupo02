@@ -14,7 +14,7 @@ interface UserApiService {
     suspend fun createUser(@Body user: UserDTO): UserDTO
 
     @PUT("users/{id}")
-    suspend fun updateUser(@Path("id") id: Long, @Body user: UserDTO): UserDTO
+    suspend fun updateUser(@Path("id") id: Long, @Body user: Unit): UserDTO
 
     @DELETE("users/{id}")
     suspend fun deleteUser(@Path("id") id: Long)

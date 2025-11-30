@@ -10,7 +10,7 @@ import com.example.fororata.api.service.*
 
 object RetrofitInstance {
 
-    private const val BASE_URL = "http://44.200.104.132:8080/api/"
+    private const val BASE_URL = "http://52.6.83.189:8080/api/"
 
     // Configurar el interceptor de logging
     private val loggingInterceptor = HttpLoggingInterceptor().apply {

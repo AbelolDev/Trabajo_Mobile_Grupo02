@@ -1,5 +1,6 @@
 package com.example.fororata.ui.screen.admin
 
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -11,11 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.fororata.api.dto.RolDTO
 import com.example.fororata.api.dto.UserDTO
 import com.example.fororata.viewmodel.APIviewmodel.UserViewModel
 import com.example.fororata.components.StatCard
@@ -28,6 +31,7 @@ fun AdminDashboardScreen(
     userViewModel: UserViewModel = hiltViewModel(),
     userRole: String = "Administrador" // Parámetro para definir el rol
 ) {
+    val context = LocalContext.current
     val users by userViewModel.users
     val isLoading by userViewModel.isLoading
 
@@ -186,30 +190,48 @@ fun AdminDashboardScreen(
     if (!isModerador) {
         // Diálogo de eliminar usuario
         showDeleteDialog?.let { user ->
+            var isDeleting by remember { mutableStateOf(false) }
+
             AlertDialog(
-                onDismissRequest = { showDeleteDialog = null },
+                onDismissRequest = { if (!isDeleting) showDeleteDialog = null },
                 icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
                 title = { Text("Eliminar Usuario") },
                 text = { Text("¿Estás seguro de eliminar a ${user.nombre}? Esta acción no se puede deshacer.") },
                 confirmButton = {
-                    TextButton(
+                    Button(
                         onClick = {
+                            isDeleting = true
                             user.id?.let { userId ->
-                                // TODO: Llamar a la función de eliminar del ViewModel
-                                // userViewModel.deleteUser(userId)
+                                userViewModel.deleteUser(userId) { success, message ->
+                                    isDeleting = false
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    if (success) {
+                                        showDeleteDialog = null
+                                    }
+                                }
                             }
-                            showDeleteDialog = null
-                            userViewModel.loadUsers()
                         },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        )
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        ),
+                        enabled = !isDeleting
                     ) {
-                        Text("Eliminar")
+                        if (isDeleting) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = MaterialTheme.colorScheme.onError,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text("Eliminar")
+                        }
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = null }) {
+                    TextButton(
+                        onClick = { showDeleteDialog = null },
+                        enabled = !isDeleting
+                    ) {
                         Text("Cancelar")
                     }
                 }
@@ -220,14 +242,11 @@ fun AdminDashboardScreen(
         showEditDialog?.let { user ->
             EditUserDialog(
                 user = user,
+                userViewModel = userViewModel,
                 onDismiss = { showEditDialog = null },
-                onSave = { updatedUser ->
-                    user.id?.let { userId ->
-                        // TODO: Llamar a la función de actualizar del ViewModel
-                        // userViewModel.updateUser(userId, updatedUser)
-                    }
+                onSuccess = {
+                    Toast.makeText(context, "Usuario actualizado", Toast.LENGTH_SHORT).show()
                     showEditDialog = null
-                    userViewModel.loadUsers()
                 }
             )
         }
@@ -437,16 +456,18 @@ fun UserAdminCard(
 @Composable
 fun EditUserDialog(
     user: UserDTO,
+    userViewModel: UserViewModel,
     onDismiss: () -> Unit,
-    onSave: (UserDTO) -> Unit
+    onSuccess: () -> Unit
 ) {
     var nombre by remember { mutableStateOf(user.nombre) }
     var correo by remember { mutableStateOf(user.correo) }
     var selectedRole by remember { mutableStateOf(user.rol?.nombre_rol ?: "Usuario") }
     var expanded by remember { mutableStateOf(false) }
+    var isUpdating by remember { mutableStateOf(false) }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isUpdating) onDismiss() },
         title = { Text("Editar Usuario") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -455,7 +476,8 @@ fun EditUserDialog(
                     onValueChange = { nombre = it },
                     label = { Text("Nombre") },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isUpdating
                 )
 
                 OutlinedTextField(
@@ -463,12 +485,13 @@ fun EditUserDialog(
                     onValueChange = { correo = it },
                     label = { Text("Correo") },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isUpdating
                 )
 
                 ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
+                    expanded = expanded && !isUpdating,
+                    onExpandedChange = { if (!isUpdating) expanded = !expanded }
                 ) {
                     OutlinedTextField(
                         value = selectedRole,
@@ -478,7 +501,8 @@ fun EditUserDialog(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor()
+                            .menuAnchor(),
+                        enabled = !isUpdating
                     )
 
                     ExposedDropdownMenu(
@@ -499,24 +523,75 @@ fun EditUserDialog(
                                 expanded = false
                             }
                         )
+                        DropdownMenuItem(
+                            text = { Text("Moderador") },
+                            onClick = {
+                                selectedRole = "Moderador"
+                                expanded = false
+                            }
+                        )
                     }
                 }
             }
         },
         confirmButton = {
-            Button(onClick = {
-                // TODO: Actualizar usuario
-                onSave(user.copy(nombre = nombre, correo = correo))
-            }) {
+            Button(
+                onClick = {
+                    isUpdating = true
+                    user.id?.let { userId ->
+                        // Determinar ID del rol basado en el nombre
+                        val rolId = when (selectedRole) {
+                            "Administrador" -> 1L
+                            "Moderador" -> 3L
+                            else -> 2L // Usuario normal
+                        }
+
+                        val updatedUser = user.copy(
+                            nombre = nombre,
+                            correo = correo,
+                            rol = user.rol?.copy(
+                                id_rol = rolId,
+                                nombre_rol = selectedRole
+                            )
+                        )
+
+                        userViewModel.updateUser(userId, updatedUser) { success, message ->
+                            isUpdating = false
+                            if (success) {
+                                onSuccess()
+                            }
+                        }
+                    }
+                },
+                enabled = !isUpdating && nombre.isNotBlank() && correo.isNotBlank()
+            ) {
+                if (isUpdating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 Text("Guardar")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isUpdating
+            ) {
                 Text("Cancelar")
             }
         }
     )
+}
+
+private fun UserDTO.copy(
+    nombre: String,
+    correo: String,
+    rol: RolDTO?
+) {
 }
 
 @Composable

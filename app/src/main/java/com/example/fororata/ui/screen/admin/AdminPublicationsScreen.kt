@@ -1,5 +1,6 @@
 package com.example.fororata.ui.screen.admin
 
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +27,7 @@ import java.util.*
 fun AdminPublicationsScreen(
     publicationViewModel: PublicationViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val publications by publicationViewModel.publications
     val isLoading by publicationViewModel.isLoading
 
@@ -129,8 +132,10 @@ fun AdminPublicationsScreen(
 
     // Diálogo de eliminar
     showDeleteDialog?.let { publication ->
+        var isDeleting by remember { mutableStateOf(false) }
+
         AlertDialog(
-            onDismissRequest = { showDeleteDialog = null },
+            onDismissRequest = { if (!isDeleting) showDeleteDialog = null },
             icon = {
                 Icon(
                     Icons.Default.Warning,
@@ -143,21 +148,38 @@ fun AdminPublicationsScreen(
                 Text("¿Estás seguro de eliminar \"${publication.titulo}\"? Esta acción no se puede deshacer.")
             },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
-                        // TODO: Implementar eliminación
-                        showDeleteDialog = null
-                        publicationViewModel.loadPublications()
+                        isDeleting = true
+                        publicationViewModel.deletePublication(publication.id) { success, message ->
+                            isDeleting = false
+                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            if (success) {
+                                showDeleteDialog = null
+                            }
+                        }
                     },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
+                    enabled = !isDeleting
                 ) {
-                    Text("Eliminar")
+                    if (isDeleting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = MaterialTheme.colorScheme.onError,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Eliminar")
+                    }
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = null }) {
+                TextButton(
+                    onClick = { showDeleteDialog = null },
+                    enabled = !isDeleting
+                ) {
                     Text("Cancelar")
                 }
             }
@@ -168,11 +190,11 @@ fun AdminPublicationsScreen(
     showEditDialog?.let { publication ->
         EditPublicationDialog(
             publication = publication,
+            publicationViewModel = publicationViewModel,
             onDismiss = { showEditDialog = null },
-            onSave = { updatedPublication ->
-                // TODO: Implementar actualización
+            onSuccess = {
+                Toast.makeText(context, "Publicación actualizada", Toast.LENGTH_SHORT).show()
                 showEditDialog = null
-                publicationViewModel.loadPublications()
             }
         )
     }
@@ -180,11 +202,11 @@ fun AdminPublicationsScreen(
     // Diálogo de crear
     if (showCreateDialog) {
         CreatePublicationDialog(
+            publicationViewModel = publicationViewModel,
             onDismiss = { showCreateDialog = false },
-            onSave = { titulo, contenido, autorId ->
-                // TODO: Implementar creación
+            onSuccess = {
+                Toast.makeText(context, "Publicación creada", Toast.LENGTH_SHORT).show()
                 showCreateDialog = false
-                publicationViewModel.loadPublications()
             }
         )
     }
@@ -381,14 +403,16 @@ fun PublicationAdminCard(
 @Composable
 fun EditPublicationDialog(
     publication: PublicationDTO,
+    publicationViewModel: PublicationViewModel,
     onDismiss: () -> Unit,
-    onSave: (PublicationDTO) -> Unit
+    onSuccess: () -> Unit
 ) {
     var titulo by remember { mutableStateOf(publication.titulo) }
     var contenido by remember { mutableStateOf(publication.contenido ?: "") }
+    var isUpdating by remember { mutableStateOf(false) }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isUpdating) onDismiss() },
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -409,7 +433,8 @@ fun EditPublicationDialog(
                     maxLines = 3,
                     leadingIcon = {
                         Icon(Icons.Default.Title, contentDescription = null)
-                    }
+                    },
+                    enabled = !isUpdating
                 )
 
                 OutlinedTextField(
@@ -422,7 +447,8 @@ fun EditPublicationDialog(
                     maxLines = 10,
                     leadingIcon = {
                         Icon(Icons.Default.Article, contentDescription = null)
-                    }
+                    },
+                    enabled = !isUpdating
                 )
 
                 Card(
@@ -456,17 +482,41 @@ fun EditPublicationDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onSave(publication.copy(titulo = titulo, contenido = contenido))
+                    isUpdating = true
+                    publication.autor.id?.let { autorId ->
+                        publicationViewModel.updatePublication(
+                            id = publication.id,
+                            titulo = titulo,
+                            contenido = contenido,
+                            autorId = autorId
+                        ) { success, message ->
+                            isUpdating = false
+                            if (success) {
+                                onSuccess()
+                            }
+                        }
+                    }
                 },
-                enabled = titulo.isNotBlank() && contenido.isNotBlank()
+                enabled = !isUpdating && titulo.isNotBlank() && contenido.isNotBlank()
             ) {
+                if (isUpdating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 Icon(Icons.Default.Save, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Guardar")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isUpdating
+            ) {
                 Text("Cancelar")
             }
         }
@@ -475,15 +525,17 @@ fun EditPublicationDialog(
 
 @Composable
 fun CreatePublicationDialog(
+    publicationViewModel: PublicationViewModel,
     onDismiss: () -> Unit,
-    onSave: (titulo: String, contenido: String, autorId: Long) -> Unit
+    onSuccess: () -> Unit
 ) {
     var titulo by remember { mutableStateOf("") }
     var contenido by remember { mutableStateOf("") }
     var autorId by remember { mutableStateOf("") }
+    var isCreating by remember { mutableStateOf(false) }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isCreating) onDismiss() },
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -505,7 +557,8 @@ fun CreatePublicationDialog(
                     maxLines = 3,
                     leadingIcon = {
                         Icon(Icons.Default.Title, contentDescription = null)
-                    }
+                    },
+                    enabled = !isCreating
                 )
 
                 OutlinedTextField(
@@ -519,7 +572,8 @@ fun CreatePublicationDialog(
                     maxLines = 10,
                     leadingIcon = {
                         Icon(Icons.Default.Article, contentDescription = null)
-                    }
+                    },
+                    enabled = !isCreating
                 )
 
                 OutlinedTextField(
@@ -531,7 +585,8 @@ fun CreatePublicationDialog(
                     singleLine = true,
                     leadingIcon = {
                         Icon(Icons.Default.Person, contentDescription = null)
-                    }
+                    },
+                    enabled = !isCreating
                 )
 
                 Card(
@@ -561,19 +616,40 @@ fun CreatePublicationDialog(
         confirmButton = {
             Button(
                 onClick = {
+                    isCreating = true
                     autorId.toLongOrNull()?.let { id ->
-                        onSave(titulo, contenido, id)
+                        publicationViewModel.createPublication(
+                            titulo = titulo,
+                            contenido = contenido,
+                            autorId = id
+                        ) { success, message ->
+                            isCreating = false
+                            if (success) {
+                                onSuccess()
+                            }
+                        }
                     }
                 },
-                enabled = titulo.isNotBlank() && contenido.isNotBlank() && autorId.toLongOrNull() != null
+                enabled = !isCreating && titulo.isNotBlank() && contenido.isNotBlank() && autorId.toLongOrNull() != null
             ) {
+                if (isCreating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Crear")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isCreating
+            ) {
                 Text("Cancelar")
             }
         }
