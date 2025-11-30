@@ -1,15 +1,18 @@
 package com.example.fororata.ui.screen.publicaciones
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,47 +43,78 @@ fun PublicacionesScreenContent(
         },
         floatingActionButton = {
             if (usuarioActual != null) {
-                FloatingActionButton(
-                    onClick = { navController.navigate("crear-publicacion") }
+                // FAB con animación
+                var visible by remember { mutableStateOf(false) }
+
+                LaunchedEffect(Unit) {
+                    visible = true
+                }
+
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = scaleIn(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ) + fadeIn(),
+                    exit = scaleOut() + fadeOut()
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Nueva publicación")
+                    FloatingActionButton(
+                        onClick = { navController.navigate("crear-publicacion") }
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Nueva publicación")
+                    }
                 }
             }
         }
     ) { paddingValues ->
         if (publicaciones.isEmpty()) {
-            Box(
+            // Animación para estado vacío
+            var visible by remember { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+                visible = true
+            }
+
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn(animationSpec = tween(600)) + expandVertically(),
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
+                    .padding(paddingValues)
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        Icons.Default.Description,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "No hay publicaciones todavía",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    if (usuarioActual != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "¡Crea la primera!",
-                            style = MaterialTheme.typography.bodyMedium
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.Description,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    } else {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            "Inicia sesión para crear publicaciones",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
+                            "No hay publicaciones todavía",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        if (usuarioActual != null) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "¡Crea la primera!",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "Inicia sesión para crear publicaciones",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             }
@@ -93,19 +127,39 @@ fun PublicacionesScreenContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                items(publicaciones) { publicacion ->
-                    PublicacionCard(
-                        publicacion = publicacion,
-                        esAutor = usuarioActual?.id == publicacion.autorId,
-                        onClick = {
-                            navController.navigate("detalle-publicacion/${publicacion.id}")
-                        },
-                        onEditar = {
-                            viewModel.cargarPublicacionParaEditar(publicacion.id)
-                            navController.navigate("editar-publicacion/${publicacion.id}")
-                        },
-                        onEliminar = { mostrarDialogoEliminar = publicacion }
-                    )
+                itemsIndexed(
+                    items = publicaciones,
+                    key = { _, pub -> pub.id }
+                ) { index, publicacion ->
+                    // Animación de entrada escalonada
+                    var visible by remember { mutableStateOf(false) }
+
+                    LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(index * 50L) // Delay escalonado
+                        visible = true
+                    }
+
+                    AnimatedVisibility(
+                        visible = visible,
+                        enter = fadeIn(animationSpec = tween(400)) +
+                                slideInVertically(
+                                    initialOffsetY = { it / 4 },
+                                    animationSpec = tween(400, easing = FastOutSlowInEasing)
+                                )
+                    ) {
+                        PublicacionCard(
+                            publicacion = publicacion,
+                            esAutor = usuarioActual?.id == publicacion.autorId,
+                            onClick = {
+                                navController.navigate("detalle-publicacion/${publicacion.id}")
+                            },
+                            onEditar = {
+                                viewModel.cargarPublicacionParaEditar(publicacion.id)
+                                navController.navigate("editar-publicacion/${publicacion.id}")
+                            },
+                            onEliminar = { mostrarDialogoEliminar = publicacion }
+                        )
+                    }
                 }
             }
         }
@@ -120,9 +174,7 @@ fun PublicacionesScreenContent(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.eliminarPublicacion(publicacion) { exito, mensaje ->
-                            // Aquí podrías mostrar un Toast con el mensaje
-                        }
+                        viewModel.eliminarPublicacion(publicacion) { _, _ -> }
                         mostrarDialogoEliminar = null
                     }
                 ) {
@@ -146,14 +198,26 @@ fun PublicacionCard(
     onEditar: () -> Unit = {},
     onEliminar: () -> Unit = {}
 ) {
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        )
+    )
+
     val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
     val fecha = dateFormat.format(Date(publicacion.fechaCreacion))
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable(onClick = onClick),
+            .scale(scale)
+            .clickable {
+                isPressed = true
+                onClick()
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
         ),
@@ -162,7 +226,7 @@ fun PublicacionCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Header con título y acciones (solo si es autor)
+            // Header con título y acciones
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -207,7 +271,7 @@ fun PublicacionCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Footer con info
+            // Footer
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -225,6 +289,13 @@ fun PublicacionCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+        }
+    }
+
+    LaunchedEffect(isPressed) {
+        if (isPressed) {
+            kotlinx.coroutines.delay(100)
+            isPressed = false
         }
     }
 }
