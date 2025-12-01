@@ -30,6 +30,8 @@ Una proyecto de foros para el ramo de "Desarrollo de aplicaciones móviles" util
 ## Captura Apk Firmada
 <img width="1207" height="670" alt="image" src="https://github.com/user-attachments/assets/04b3aee9-22f0-4143-b1ac-da4654b690e9" />
 
+Link trello: https://trello.com/invite/b/68c87e9a0eebb7d1130fd4c6/ATTI3a9a83f555ce0949266c7ea41e04e35cF55042EB/foro-rata
+
 ##
 
 ## Documentación de APIS
