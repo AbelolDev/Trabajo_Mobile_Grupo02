@@ -22,7 +22,7 @@ Una proyecto de foros para el ramo de "Desarrollo de aplicaciones móviles" util
 
 ## Tecnologías
 
-* Frontend con Kotlin Jectpack Compose
+* Frontend con Kotlin Jetpack Compose
 * Backend con microservicios utilizando Spring Boot
 * Base de datos remota hosteada en Oracle OCI
 
