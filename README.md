@@ -26,6 +26,10 @@ Una proyecto de foros para el ramo de "Desarrollo de aplicaciones móviles" util
 * Backend con microservicios utilizando Spring Boot
 * Base de datos remota hosteada en Oracle OCI
 
+
+## Captura Apk Firmada
+<img width="1207" height="670" alt="image" src="https://github.com/user-attachments/assets/04b3aee9-22f0-4143-b1ac-da4654b690e9" />
+
 ##
 
 ## Documentación de APIS
