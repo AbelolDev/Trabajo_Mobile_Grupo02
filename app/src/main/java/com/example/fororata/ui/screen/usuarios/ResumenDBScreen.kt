@@ -293,33 +293,6 @@ fun ResumenDBScreenContent(
                             .padding(horizontal = 24.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Botón de editar perfil
-                        FilledTonalButton(
-                            onClick = {
-                                // Navegar a edición de perfil
-                                navController.navigate("editarPerfil")
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                            ),
-                            shape = MaterialTheme.shapes.medium,
-                            enabled = true
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Editar",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                "Editar Perfil",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-
                         // Botón de cerrar sesión
                         OutlinedButton(
                             onClick = {
