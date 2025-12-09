@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,12 +22,12 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.fororata.components.ImagenInteligente
 import com.example.fororata.viewmodel.PerfilViewModel
 import com.example.fororata.viewmodel.UsuarioViewModel
+import com.example.fororata.components.AnimatedContinueButton
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,7 +140,7 @@ fun FotoUsuarioScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(48.dp)) // Más espacio antes de la imagen
 
             // Imagen con animación
             AnimatedVisibility(
@@ -155,7 +154,7 @@ fun FotoUsuarioScreen(
                 ) + fadeIn(animationSpec = tween(600))
             ) {
                 Box(
-                    modifier = Modifier.size(200.dp),
+                    modifier = Modifier.size(220.dp), // Un poco más grande
                     contentAlignment = Alignment.Center
                 ) {
                     // Pulso de fondo si no hay imagen
@@ -173,7 +172,7 @@ fun FotoUsuarioScreen(
 
                         Surface(
                             modifier = Modifier
-                                .size(220.dp)
+                                .size(240.dp) // Más grande para el efecto de pulso
                                 .scale(scale),
                             shape = MaterialTheme.shapes.extraLarge,
                             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
@@ -195,7 +194,7 @@ fun FotoUsuarioScreen(
                     ) { targetImage ->
                         ImagenInteligente(
                             imageUri = targetImage,
-                            size = 200.dp,
+                            size = 220.dp, // Más grande
                             borderWidth = 4.dp,
                             borderColor = MaterialTheme.colorScheme.primary
                         )
@@ -203,24 +202,26 @@ fun FotoUsuarioScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(60.dp)) // Más espacio antes de los botones
 
-            // Botones de captura animados
+            // Botones de captura animados - VERSIÓN CENTRADA Y MÁS GRANDE
             AnimatedVisibility(
                 visible = showButtons,
                 enter = fadeIn(animationSpec = tween(600)) +
                         expandVertically(animationSpec = tween(600))
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(24.dp) // Más espacio vertical
+                ) {
+                    // Botones en columnas centradas
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        AnimatedActionButton(
-                            text = "Cámara",
-                            icon = Icons.Default.CameraAlt,
-                            modifier = Modifier.weight(1f),
-                            delay = 0,
+                        // Botón de Cámara - MÁS GRANDE
+                        Button(
                             onClick = {
                                 val permission = Manifest.permission.CAMERA
                                 if (ContextCompat.checkSelfPermission(context, permission)
@@ -232,16 +233,51 @@ fun FotoUsuarioScreen(
                                 } else {
                                     requestPermissionLauncher.launch(permission)
                                 }
-                            }
-                        )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f) // 80% del ancho disponible
+                                .height(60.dp), // Altura aumentada
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.CameraAlt,
+                                contentDescription = "Cámara",
+                                modifier = Modifier.size(28.dp) // Icono más grande
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                "Tomar Foto",
+                                style = MaterialTheme.typography.titleMedium, // Texto más grande
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
 
-                        AnimatedActionButton(
-                            text = "Galería",
-                            icon = Icons.Default.PhotoLibrary,
-                            modifier = Modifier.weight(1f),
-                            delay = 100,
-                            onClick = { launcherGaleria.launch("image/*") }
-                        )
+                        // Botón de Galería - MÁS GRANDE
+                        Button(
+                            onClick = { launcherGaleria.launch("image/*") },
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f) // 80% del ancho disponible
+                                .height(60.dp), // Altura aumentada
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.onSecondary
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.PhotoLibrary,
+                                contentDescription = "Galería",
+                                modifier = Modifier.size(28.dp) // Icono más grande
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                "Elegir de Galería",
+                                style = MaterialTheme.typography.titleMedium, // Texto más grande
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
 
                     // Botón para eliminar foto
@@ -252,20 +288,33 @@ fun FotoUsuarioScreen(
                     ) {
                         OutlinedButton(
                             onClick = { perfilViewModel.limpiarImagenPerfil() },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f) // Mismo ancho que los otros botones
+                                .height(50.dp), // Un poco menos alto
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder.copy(
+                                width = 1.5.dp // Borde más grueso
                             )
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = null)
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Eliminar",
+                                modifier = Modifier.size(24.dp)
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Eliminar foto")
+                            Text(
+                                "Eliminar foto",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Botones de navegación animados
             AnimatedVisibility(
@@ -282,7 +331,7 @@ fun FotoUsuarioScreen(
                 ) {
                     OutlinedButton(
                         onClick = { navController.navigate("registro") },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(4f)
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                         Spacer(modifier = Modifier.width(4.dp))
@@ -291,7 +340,7 @@ fun FotoUsuarioScreen(
 
                     AnimatedContinueButton(
                         enabled = imagenPerfil != null,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(4f),
                         onClick = { navController.navigate("resumen") }
                     )
                 }
@@ -329,112 +378,6 @@ fun FotoUsuarioScreen(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun AnimatedActionButton(
-    text: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    modifier: Modifier = Modifier,
-    delay: Long,
-    onClick: () -> Unit
-) {
-    var visible by remember { mutableStateOf(false) }
-    var isPressed by remember { mutableStateOf(false) }
-
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-    )
-
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(delay)
-        visible = true
-    }
-
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(animationSpec = tween(400)) +
-                scaleIn(
-                    initialScale = 0.8f,
-                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-                )
-    ) {
-        ElevatedButton(
-            onClick = {
-                isPressed = true
-                onClick()
-            },
-            modifier = modifier
-                .height(56.dp)
-                .scale(scale)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text, fontSize = 12.sp)
-            }
-        }
-    }
-
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            delay(150)
-            isPressed = false
-        }
-    }
-}
-
-@Composable
-fun AnimatedContinueButton(
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    var isPressed by remember { mutableStateOf(false) }
-
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
-    )
-
-    val backgroundColor by animateColorAsState(
-        targetValue = if (enabled)
-            MaterialTheme.colorScheme.primary
-        else
-            MaterialTheme.colorScheme.surfaceVariant,
-        animationSpec = tween(300)
-    )
-
-    Button(
-        onClick = {
-            if (enabled) {
-                isPressed = true
-                onClick()
-            }
-        },
-        enabled = enabled,
-        modifier = modifier
-            .height(56.dp)
-            .scale(scale),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor
-        )
-    ) {
-        Text("Continuar")
-        Spacer(modifier = Modifier.width(4.dp))
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
-    }
-
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            delay(150)
-            isPressed = false
         }
     }
 }
