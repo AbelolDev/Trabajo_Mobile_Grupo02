@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// ========== SEALED CLASSES FUERA DEL VIEWMODEL ==========
-
 // Estados de creación de usuario
 sealed class CreateUserState {
     object Idle : CreateUserState()

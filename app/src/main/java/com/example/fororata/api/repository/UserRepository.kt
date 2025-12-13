@@ -25,7 +25,7 @@ class UserRepository @Inject constructor(
     }
 
     // Actualizar usuario
-    suspend fun updateUser(id: Long, user: Unit): UserDTO = withContext(Dispatchers.IO) {
+    suspend fun updateUser(id: Long, user: UserDTO): UserDTO = withContext(Dispatchers.IO) {
         userApiService.updateUser(id, user)
     }
 
@@ -35,6 +35,9 @@ class UserRepository @Inject constructor(
             userApiService.deleteUser(id)
             true
         } catch (e: Exception) {
+            // Log del error para debugging
+            println("Error al eliminar usuario $id: ${e.message}")
+            e.printStackTrace()
             false
         }
     }

@@ -1,4 +1,4 @@
-package com.example.fororata.components
+package com.example.fororata.components.admin
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
